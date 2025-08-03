@@ -2,7 +2,8 @@
 
 
 Plane::Plane(double size, double z_offset) {
-    SIZE_X = size / RESOLUTION, SIZE_Y = size / RESOLUTION;
+    SIZE_X = static_cast<int>(size / RESOLUTION),
+    SIZE_Y = static_cast<int>(size / RESOLUTION);
     SIZE = SIZE_X * SIZE_Y;
     initial_points_x.resize(SIZE);
     initial_points_y.resize(SIZE);
@@ -10,10 +11,10 @@ Plane::Plane(double size, double z_offset) {
     initial_normal[2] = 1;
     for (int y = 0; y < SIZE_Y; y++) {
         for (int x = 0; x < SIZE_X; x++) {
-            int o = x + SIZE_X * y;
-            initial_points_x[o] = x * RESOLUTION - RESOLUTION * SIZE_X / 2;
-            initial_points_y[o] = y * RESOLUTION - RESOLUTION * SIZE_Y / 2;
-            initial_points_z[o] = -z_offset;
+            int index = x + SIZE_X * y;
+            initial_points_x[index] = x * RESOLUTION - RESOLUTION * SIZE_X / 2;
+            initial_points_y[index] = y * RESOLUTION - RESOLUTION * SIZE_Y / 2;
+            initial_points_z[index] = -z_offset;
         }
     }
     clear();
@@ -21,13 +22,16 @@ Plane::Plane(double size, double z_offset) {
 
 Plane::Plane(double size, double z_offset, int direction) {
     A = size;
-    SIZE_X = size / RESOLUTION, SIZE_Y = size / RESOLUTION;
+    SIZE_X = static_cast<int>(size / RESOLUTION),
+    SIZE_Y = static_cast<int>(size / RESOLUTION);
     SIZE = SIZE_X * SIZE_Y;
     initial_points_x.resize(SIZE);
     initial_points_y.resize(SIZE);
     initial_points_z.resize(SIZE);
 
-    std::vector<double>*ptr_1, *ptr_2, *ptr_flat;
+    std::vector<double>* ptr_1;
+    std::vector<double>* ptr_2;
+    std::vector<double>* ptr_flat;
     int offset_direction = 1;
 
     switch (direction) {
@@ -74,34 +78,15 @@ Plane::Plane(double size, double z_offset, int direction) {
 
     for (int y = 0; y < SIZE_Y; y++) {
         for (int x = 0; x < SIZE_X; x++) {
-            int o = x + SIZE_X * y;
-            ptr_1->at(o) =
+            int index = x + SIZE_X * y;
+            ptr_1->at(index) =
                 x * RESOLUTION - RESOLUTION * SIZE_X / 2 + RESOLUTION / 2;
-            ptr_2->at(o) =
+            ptr_2->at(index) =
                 y * RESOLUTION - RESOLUTION * SIZE_Y / 2 + RESOLUTION / 2;
-            ptr_flat->at(o) = z_offset * offset_direction;
+            ptr_flat->at(index) = z_offset * offset_direction;
         }
     }
     clear();
-}
-
-void Plane::rotate_x(double angle, double& y, double& z) {
-    double sin_alpha = sin(angle), cos_alpha = cos(angle);
-    double tmp_y = y;
-    y = y * cos_alpha - z * sin_alpha;
-    z = tmp_y * sin_alpha + z * cos_alpha;
-}
-void Plane::rotate_y(double angle, double& x, double& z) {
-    double sin_beta = sin(angle), cos_beta = cos(angle);
-    double tmp_x = x;
-    x = tmp_x * cos_beta + z * sin_beta;
-    z = -tmp_x * sin_beta + z * cos_beta;
-}
-void Plane::rotate_z(double angle, double& x, double& y) {
-    double sin_gamma = sin(angle), cos_gamma = cos(angle);
-    double tmp_x = x;
-    x = tmp_x * cos_gamma - y * sin_gamma;
-    y = tmp_x * sin_gamma + y * cos_gamma;
 }
 
 void Plane::calculate_dot_product() {
@@ -194,20 +179,21 @@ void Plane::pmove(double x, double y, double z) {
 
 void Plane::draw(Canvas& canvas) {
     int x = (std::min)(canvas.size_x, canvas.size_y);
-    double k2 = (double)A / ((double)canvas.size_y * 0.005);
-    double k1 = 50;
+    double depth = (double)A / ((double)canvas.size_y * 0.005);
+    double fov = 50;
 
     for (int point = 0; point < SIZE; point++) {
-        double inverse_z = 1 / ((points_z[point]) + k2);
-        int px = (int)(canvas.size_x / 2 + k1 * inverse_z * (points_x[point])),
-            py = (int)(canvas.size_y / 1.95 +
-                       (k1 / 2) * inverse_z * (points_y[point]));
+        double inverse_z = 1 / ((points_z[point]) + depth);
+        int pint_x =
+            (int)(canvas.size_x / 2.0 + fov * inverse_z * (points_x[point]));
+        int point_y = (int)(canvas.size_y / 1.95 +
+                            (fov / 2) * inverse_z * (points_y[point]));
 
-        int o = px + canvas.size_x * py;
+        int index = pint_x + canvas.size_x * point_y;
         int normal = (int)(8 * (dot_product));
-        if (py < canvas.size_y && py >= 0 && px >= 0 &&
-            px <= canvas.size_x - 1 && inverse_z > canvas.z_buffer[o]) {
-            canvas.z_buffer[o] = inverse_z;
+        if (point_y < canvas.size_y && point_y >= 0 && pint_x >= 0 &&
+            pint_x <= canvas.size_x - 1 && inverse_z > canvas.z_buffer[index]) {
+            canvas.z_buffer[index] = inverse_z;
             char _char;
 
             if (normal > 0) {
@@ -219,7 +205,7 @@ void Plane::draw(Canvas& canvas) {
             /* for debugging uncomment the line below */
             // _char = no + '@';
 
-            canvas.set(o, _char, colour);
+            canvas.set(index, _char, colour);
         }
     }
 }

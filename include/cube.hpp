@@ -9,15 +9,14 @@ class Cube {
     private:
     std::vector<Plane> planes;
     double SIZE;
-
-    public:
     std::vector<std::string> colour;
     std::vector<double> get_points(std::vector<double>& points_x,
                                    std::vector<double>& points_y,
                                    std::vector<double>& points_z);
-    int no;
 
     public:
+    int no;
+
     Cube(double size);
 
     void rotate_x(double angle);

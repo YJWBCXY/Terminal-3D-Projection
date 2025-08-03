@@ -5,17 +5,18 @@
 
 class Canvas {
     private:
-    public:
-    int size, size_x, size_y;
+    int size;
     std::vector<char> canvas;
     std::vector<std::string> canvas_colours;
-    std::vector<double> z_buffer;
 
     public:
-    Canvas(const int x, const int y);
+    int size_x, size_y;
+    std::vector<double> z_buffer;
+
+    Canvas(int x, int y);
 
     void set(int index, char _char);
-    void set(int index, char _char, std::string colour);
+    void set(int index, char _char, std::string& colour);
 
     std::string to_string();
 

@@ -15,6 +15,7 @@
 #define BLUE "\033[96m"
 #define WHITE "\033[97m"
 #define MAGENTA "\033[95m"
+#define BLACK "\033[90m"
 
 #define FRONT 0
 #define BACK 1

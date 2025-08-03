@@ -12,7 +12,9 @@ Magic_cube::Magic_cube(double size) {
                 // }
                 Cube cube = Cube(psize);
 
-                double x = 0, y = 0, z = 0;
+                double x = 0;
+                double y = 0;
+                double z = 0;
 
 
                 if (k == 0) {

@@ -5,7 +5,6 @@
     #include <cmath>
 #endif
 
-#include <stdlib.h>
 #include <vector>
 
 #include "cube.hpp"

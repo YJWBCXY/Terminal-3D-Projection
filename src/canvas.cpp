@@ -11,7 +11,7 @@ Canvas::Canvas(const int x, const int y) {
         } else {
             canvas.push_back(' ');
         }
-        canvas_colours.push_back(WHITE);
+        canvas_colours.emplace_back(WHITE);
         z_buffer.push_back(0.0);
     }
 }
@@ -19,7 +19,7 @@ Canvas::Canvas(const int x, const int y) {
 void Canvas::set(int index, char _char) {
     canvas[index] = _char;
 }
-void Canvas::set(int index, char _char, std::string colour) {
+void Canvas::set(int index, char _char, std::string& colour) {
     canvas[index] = _char;
     canvas_colours[index] = colour;
 }
